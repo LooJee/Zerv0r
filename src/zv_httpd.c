@@ -6,6 +6,9 @@
 #include <unistd.h>
 
 #include "zv_httpd.h"
+#include "zv_req.h"
+
+const char rep[] = "HTTP/1.1 200 OK\r\nContent-Length: 11\r\nConTent-Type: text/plain\r\n\r\nHello world";
 
 int powerOn(void)
 {
@@ -18,6 +21,11 @@ int powerOn(void)
     srv.sin_addr.s_addr = htonl(INADDR_ANY);
     srv.sin_port = htons(9999);
     srv.sin_family = AF_INET;
+
+    if (setsockopt(httpd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) < 0) {
+        perror("setsocketopt failed\n");
+        return -1;
+    }
 
     printf("power on...\n");
 
@@ -44,7 +52,14 @@ int powerOn(void)
         printf("new connection...\n");
         while ((nbytes = read(client, buf, 1024)) > 0) {
             printf("%s", buf);
-            write(client, buf, nbytes);
+            if (zv_parseHead(buf, nbytes) == 0) {
+                printf("hello world\n");
+                write(client, rep, strlen(rep));
+            }
+            else {
+                printf("goodbye\n");
+            }
+            // write(client, buf, nbytes);
             memset(buf, 0, 1024);
         }
 
