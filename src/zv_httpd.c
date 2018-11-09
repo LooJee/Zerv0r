@@ -10,38 +10,68 @@
 #include "zv_httpd.h"
 #include "zv_req.h"
 
+#define BASE_DATASIZE_FEET 256
+
 const char rep[] = "HTTP/1.1 200 OK\r\nContent-Length: 11\r\nConTent-Type: text/plain\r\n\r\nHello world";
 
 typedef struct{
     int clientfd;
 } THREAD_PARAM_S;
 
-void *handleClient(void *arg)
+
+int handleRead(char *data, THREAD_PARAM_S *param)
 {
-    char buf[1024] = {0};
-    int ret = -1;
     int nbytes = 0;
-    THREAD_PARAM_S *param = (THREAD_PARAM_S*)arg;
-
-    printf("handle client %u\n", pthread_self());
-
-    while ((nbytes = read(param->clientfd, buf, 1024)) >= 0) {
+    int dataSize = BASE_DATASIZE_FEET;
+    int offset = 0;
+    int ret = 0;
+    while ((nbytes = read(param->clientfd, data+offset, BASE_DATASIZE_FEET)) >= 0) {
         if (nbytes == 0) {
-            printf("read end\n");
             break;
+        } else if (nbytes < BASE_DATASIZE_FEET) {
+            printf("read end : %s\n", data);
+            if (zv_parseHead(data, dataSize) == 0){
+                write(param->clientfd, rep, strlen(rep));
+            }
+            else {
+                printf("goodbye\n");
+            }
+            offset = 0;
+            memset(data, 0, strlen(data));
+        } else {
+            offset += nbytes;
+            if (dataSize <= offset) {
+                dataSize += BASE_DATASIZE_FEET;
+                data = (char *)realloc(data, dataSize);
+            }
         }
-        printf("%s", buf);
-        if (zv_parseHead(buf, nbytes) == 0){
-            write(param->clientfd, rep, strlen(rep));
-        }
-        else {
-            printf("goodbye\n");
-        }
-        memset(buf, 0, 1024);
     }
 
     if (nbytes < 0) {
         perror("read failed\n");
+        ret = -1;
+    }
+
+    if (data) {
+        free(data);
+        data = NULL;
+    }
+
+    return ret;
+}
+
+void *handleClient(void *arg)
+{
+    char *data = NULL;
+    int ret = -1;
+    THREAD_PARAM_S *param = (THREAD_PARAM_S*)arg;
+
+    data = (char *)malloc(BASE_DATASIZE_FEET);
+    if (data == NULL) {
+        perror("malloc data size failed");
+    } else {
+        printf("handle client %u\n", pthread_self());
+        handleRead(data, param);
     }
 
     close(param->clientfd);
@@ -102,14 +132,13 @@ int powerOn(void)
         }
 
         pthread_t thid;
-        void *ret;
         if (pthread_create(&thid, NULL, handleClient, (void*)param)) {
             perror("create thread failed");
             continue;
         }
         printf("child thread id : %u\n", thid);
 
-        if (!pthread_detach(thid)) {
+        if (pthread_detach(thid)) {
             perror("detach thread failed");
             continue;
         }
