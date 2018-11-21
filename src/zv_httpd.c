@@ -9,6 +9,7 @@
 
 #include "zv_httpd.h"
 #include "zv_req.h"
+#include "zv_reqStruct.h"
 
 #define BASE_DATASIZE_FEET 256
 
@@ -30,11 +31,16 @@ int handleRead(char *data, THREAD_PARAM_S *param)
             break;
         } else if (nbytes < BASE_DATASIZE_FEET) {
             printf("read end : %s\n", data);
-            if (zv_parseHead(data, dataSize) == 0){
+            reqHead_S head = {0};
+            if (zv_parseHead(data, dataSize, &head) == 0){
                 write(param->clientfd, rep, strlen(rep));
             }
             else {
                 printf("goodbye\n");
+            }
+
+            if (strcmp(head.Connection, "keep-alive") != 0) {
+                break;
             }
             offset = 0;
             memset(data, 0, strlen(data));
