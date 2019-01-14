@@ -144,6 +144,7 @@ int powerOn(void)
         }
         printf("child thread id : %u\n", thid);
 
+        /*使用pthread_detach,主线程就不需要等待子线程结束，子线程结束时，资源将自动释放*/
         if (pthread_detach(thid)) {
             perror("detach thread failed");
             continue;
