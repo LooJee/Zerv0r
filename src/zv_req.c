@@ -31,26 +31,18 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
 
     printf("method : %s, url : %s, version : %s\n", head->method, head->url, head->version);
 
-    // while (*req != '\0') {
-    //     memset(headType, 0, sizeof(headType));
-    //     for (int i = 0; i < MAX_HEADTYPE_SIZE && *req != ':'; ++i, ++req) {
-    //         headType[i] = *req;
-    //     }
-    //     printf("head type : %s\n", headType);
-    //     if (strcmp(headType, "Connection") == 0) {
-    //         while (*(req++) == ' ') {}
+    //报文首部和报文正文以另起一行的\r\n来分隔
+    while (*req != '\r' && *(req+1) != '\n') {
+        char method[MAX_HEADTYPE_SIZE] = {0};
+        int i = 0;
+        while (*req != ':') {
+            method[i++] = *(req++);
+        }
+        printf("method : %s\n", method);
 
-    //         for (int i = 0; i < MAX_CONNECTION_SIZE && *req != '\r'; ++i, ++req) {
-    //             head->Connection[i] = *req;
-    //         }
-
-    //         break;
-    //     }
-
-    //     while (*(req++) != '\n'){}
-    // }
-
-    // printf("method : %s, url : %s, version : %s, Connection : %s\n", head->method, head->url, head->version, head->Connection);
+        //skip one request method
+        while (*req++ != '\n'){}
+    }
 
     if (strncmp(head->method, "GET", strlen("GET")) == 0) {
         return 0;
