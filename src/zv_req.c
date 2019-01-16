@@ -46,8 +46,9 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
 
     if (strncmp(head->method, "GET", strlen("GET")) == 0) {
         return 0;
-    }
-    else {
+    } else if (strncmp(head->method, "POST", strlen("POST")) == 0) {
+        return 0;
+    } else {
         return -1;
     }
 

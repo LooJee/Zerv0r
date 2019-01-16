@@ -97,7 +97,7 @@ int powerOn(void)
     socklen_t addrlen = sizeof(struct sockaddr_in);
     httpd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     srv.sin_addr.s_addr = htonl(INADDR_ANY);
-    srv.sin_port = htons(9999);
+    srv.sin_port = htons(8800);
     srv.sin_family = AF_INET;
 
     if (setsockopt(httpd, SOL_SOCKET, SO_REUSEADDR, &sockOpt, sizeof(int)) < 0){

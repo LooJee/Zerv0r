@@ -8,6 +8,20 @@
 #define MAX_CONNECTION_SIZE 16
 
 typedef struct {
+    char *method;
+    char *url;
+    char *version;
+}hdrReqLine_T, *pHdrReqLine_T;
+
+typedef struct {
+    char *Host;
+}hdrHost_T, *pHdrHost_T;
+
+typedef struct {
+    char *connType;
+}hdrConn_T, *pHdrConn_T;
+
+typedef struct {
     char method[MAX_METHOD_SIZE];
     char url[MAX_URL_SIZE];
     char version[MAX_VERSION_SIZE];
