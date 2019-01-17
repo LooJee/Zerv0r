@@ -22,9 +22,7 @@ typedef struct {
 }hdrConn_T, *pHdrConn_T;
 
 typedef struct {
-    char method[MAX_METHOD_SIZE];
-    char url[MAX_URL_SIZE];
-    char version[MAX_VERSION_SIZE];
+    pHdrReqLine_T reqline;
     char Host[MAX_HOST_SIZE];
     char Connection[MAX_CONNECTION_SIZE];
 }reqHead_S, *pReqHead_S;
