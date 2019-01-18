@@ -1,12 +1,6 @@
 #ifndef _ZV_REQSTRUCT_H_
 #define _ZV_REQSTRUCT_H_
 
-#define MAX_METHOD_SIZE     16
-#define MAX_URL_SIZE        128
-#define MAX_VERSION_SIZE    16
-#define MAX_HOST_SIZE       64
-#define MAX_CONNECTION_SIZE 16
-
 typedef struct {
     char *method;
     char *url;
@@ -14,7 +8,8 @@ typedef struct {
 }hdrReqLine_T, *pHdrReqLine_T;
 
 typedef struct {
-    char *Host;
+    char *host;
+    char *port;
 }hdrHost_T, *pHdrHost_T;
 
 typedef struct {
@@ -22,9 +17,8 @@ typedef struct {
 }hdrConn_T, *pHdrConn_T;
 
 typedef struct {
-    pHdrReqLine_T reqline;
-    char Host[MAX_HOST_SIZE];
-    char Connection[MAX_CONNECTION_SIZE];
+    pHdrReqLine_T   reqline;
+    pHdrHost_T      host;
 }reqHead_S, *pReqHead_S;
 
 #endif

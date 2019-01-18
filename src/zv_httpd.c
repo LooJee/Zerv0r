@@ -39,9 +39,9 @@ int handleRead(char *data, THREAD_PARAM_S *param)
                 printf("goodbye\n");
             }
 
-            if (strcmp(head.Connection, "keep-alive") != 0) {
-                break;
-            }
+            // if (strcmp(head.Connection, "keep-alive") != 0) {
+            //     break;
+            // }
             offset = 0;
             memset(data, 0, strlen(data));
         } else {

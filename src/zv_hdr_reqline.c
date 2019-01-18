@@ -1,6 +1,4 @@
 #include "zv_reqStruct.h"
-#include <stdio.h>
-#include <string.h>
 #include "zv_common.h"
 #include "zv_hdr_func.h"
 
@@ -14,7 +12,6 @@ int hdrReqlineInit(pHdrReqLine_T *reqline)
     (*reqline)->method = NULL;
     (*reqline)->url = NULL;
     (*reqline)->version = NULL;
-    printf("inited\n");
 
     return 0;
 }
@@ -37,27 +34,47 @@ int hdrReqlineParse(pHdrReqLine_T reqline, const char *value)
     char *s = value, *e = value;
     e = strchr(s, ' ');
     reqline->method = (char *)malloc(e-s);
+    if (reqline->method == NULL) {
+        printf("alloc method failed\n");
+        hdrReqlineFree(&reqline);
+        return -1;
+    }
     strncpy(reqline->method, s, e-s);
 
     SKIP_SPACE(e);
     s = e;
     e = strchr(s, ' ');
     reqline->url = (char *)malloc(e-s);
+    if (reqline->url == NULL) {
+        printf("alloc url failed\n");
+        hdrReqlineFree(&reqline);
+        return -1;
+    }
     strncpy(reqline->url, s, e-s);
 
     SKIP_SPACE(e);
     s = e;
     e = strchr(s, '\r');
     reqline->version = (char *)malloc(e-s);
+    if (reqline->version == NULL) {
+        printf("alloc version failed\n");
+        hdrReqlineFree(&reqline);
+        return -1;
+    }
     strncpy(reqline->version, s, e-s);
 
     e = strchr(e, '\n');
+    SKIP_NEWLINE(e);
 
-    return e-value+1;
+    return e-value;
 }
 
 int hdrReqlineSet(pReqHead_S head, const char *value)
 {
+    if (head == NULL) {
+        return -1;
+    }
+
     if (hdrReqlineInit(&(head->reqline))) {
         return -1;
     }

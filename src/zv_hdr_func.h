@@ -4,5 +4,6 @@
 #include "zv_reqStruct.h"
 
 int hdrReqlineSet(pReqHead_S head, const char *value);
+int hdrHostSet(pReqHead_S head, const char *value);
 
 #endif

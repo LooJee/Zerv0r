@@ -21,13 +21,19 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
     while (*req != '\r' && *(req+1) != '\n') {
         char method[MAX_HEADTYPE_SIZE] = {0};
         int i = 0;
+        int offset = 0;
         while (*req != ':') {
             method[i++] = *(req++);
         }
         printf("method : %s\n", method);
+        if (strcmp(method, "Host") == 0) {
+            offset = hdrHostSet(head, req);
+            req += offset;
+            printf("host : %s, port : %s\n", head->host->host, head->host->port);
+        }
 
         //skip one request method
-        while (*req++ != '\n'){}
+        // while (*req++ != '\n'){}
     }
 
     if (strncmp(head->reqline->method, "GET", strlen("GET")) == 0) {
