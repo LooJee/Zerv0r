@@ -4,6 +4,22 @@
 #include "zv_common.h"
 #include "zv_hdr_func.h"
 
+static headCBs_t gHeadsHandles[] = {
+    {HEAD_HOST, hdrHostSet}
+};
+#define NUMBER_OF_HEADS (sizeof(gHeadsHandles)/sizeof(headCBs_t))
+
+int zv_callHeadCBs(pReqHead_S heads, const char * head,const char *values)
+{
+    for (int i = 0; i != NUMBER_OF_HEADS; ++i) {
+        if (strncmp(head, gHeadsHandles[i].head, strlen(head)) == 0) {
+            return gHeadsHandles[i].headCB(heads, values);
+        }
+    }
+
+    return -2;
+}
+
 int zv_parseHead(const char *req, int size, pReqHead_S head)
 {
 #define MAX_HEADTYPE_SIZE 64
@@ -26,14 +42,11 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
             method[i++] = *(req++);
         }
         printf("method : %s\n", method);
-        if (strcmp(method, "Host") == 0) {
-            offset = hdrHostSet(head, req);
+        if ((offset = zv_callHeadCBs(head, method, req)) < 0) {
+            SKIP_NEWLINE(req);
+        } else {
             req += offset;
-            printf("host : %s, port : %s\n", head->host->host, head->host->port);
         }
-
-        //skip one request method
-        // while (*req++ != '\n'){}
     }
 
     if (strncmp(head->reqline->method, "GET", strlen("GET")) == 0) {

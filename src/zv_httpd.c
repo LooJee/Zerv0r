@@ -19,7 +19,6 @@ typedef struct{
     int clientfd;
 } THREAD_PARAM_S;
 
-
 int handleRead(char *data, THREAD_PARAM_S *param)
 {
     int nbytes = 0;
@@ -34,14 +33,13 @@ int handleRead(char *data, THREAD_PARAM_S *param)
             reqHead_S head = {0};
             if (zv_parseHead(data, dataSize, &head) == 0){
                 write(param->clientfd, rep, strlen(rep));
+                break;
             }
             else {
                 printf("goodbye\n");
+                break;
             }
 
-            // if (strcmp(head.Connection, "keep-alive") != 0) {
-            //     break;
-            // }
             offset = 0;
             memset(data, 0, strlen(data));
         } else {
