@@ -23,8 +23,6 @@ int zv_callHeadCBs(pReqHead_S heads, const char * head,const char *values)
 int zv_parseHead(const char *req, int size, pReqHead_S head)
 {
 #define MAX_HEADTYPE_SIZE 64
-    printf("req : %s\n", req);
-
     int ret = hdrReqlineSet(head, req);
     if (ret == -1) {
         return -1;
@@ -49,13 +47,13 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
         }
     }
 
-    if (strncmp(head->reqline->method, "GET", strlen("GET")) == 0) {
-        return 0;
-    } else if (strncmp(head->reqline->method, "POST", strlen("POST")) == 0) {
-        return 0;
-    } else {
-        return -1;
-    }
+//    if (strncmp(head->reqline->method, "GET", strlen("GET")) == 0) {
+//        return 0;
+//    } else if (strncmp(head->reqline->method, "POST", strlen("POST")) == 0) {
+//        return 0;
+//    } else {
+//        return -1;
+//    }
 
     return 0;
 }

@@ -7,7 +7,6 @@
 #include "zv_resp.h"
 #include "zv_common.h"
 
-
 static const char ngx_http_error_404_page[] =
         "<html>" CRLF
         "<head><title>404 Not Found</title></head>" CRLF

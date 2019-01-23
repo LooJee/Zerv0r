@@ -55,10 +55,7 @@ int handleRead(char *data, THREAD_PARAM_S *param)
         ret = -1;
     }
 
-    if (data) {
-        free(data);
-        data = NULL;
-    }
+    S_FREE(data);
 
     return ret;
 }
@@ -78,8 +75,8 @@ void *handleClient(void *arg)
     }
 
     close(param->clientfd);
-    free(param);
-    param = NULL;
+    S_FREE(param);
+    printf("handle client end\n");
 
     pthread_exit((void *)&ret);
 }
