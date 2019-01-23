@@ -31,9 +31,6 @@ int handleRead(char *data, THREAD_PARAM_S *param)
         } else if (nbytes < BASE_DATASIZE_FEET) {
             reqHead_S head = {0};
             if (zv_parseHead(data, dataSize, &head) == 0){
-                // write(param->clientfd, rep, strlen(rep));
-//                respText(param->clientfd, ZV_HTTP_OK, "hello world");
-//                respHTML(param->clientfd, ZV_HTTP_OK, "Google.html");
                 zvHandleRouters(param->clientfd, &head);
                 break;
             }

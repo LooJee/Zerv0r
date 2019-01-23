@@ -15,9 +15,16 @@ static const char ngx_http_error_404_page[] =
         "<center><h1>404 Not Found</h1></center>" CRLF
 ;
 
+static const char http_hello_page[] =
+        "<html>" CRLF
+        "<head><title>Welcome</title></head>" CRLF
+        "<body>" CRLF
+        "<center><h1>Hello World!</h1></center>" CRLF
+;
+
 static void rootRouterHandler(int sock, pReqHead_S head)
 {
-    respHTMLFile(sock, ZV_HTTP_OK, head->reqline->url);
+    respHTMLText(sock, ZV_HTTP_OK, http_hello_page);
 }
 
 static routers_T gRouters[] = {
