@@ -6,7 +6,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./output/)
 
 aux_source_directory(./src DIR_SRCS)
 
-add_compile_options(-g -Wall)
+add_compile_options(-g -Wall -std=c99)
 link_libraries(pthread)
 
 add_executable(Zerv0r ${DIR_SRCS})

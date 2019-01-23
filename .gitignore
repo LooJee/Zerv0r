@@ -1,3 +1,4 @@
-src/a.out
 output
 .vscode
+.idea
+cmake-build-debug

@@ -10,10 +10,10 @@
 #include "zv_httpd.h"
 #include "zv_req.h"
 #include "zv_reqStruct.h"
+#include "zv_resp.h"
+#include "zv_router_handlers.h"
 
 #define BASE_DATASIZE_FEET 256
-
-const char rep[] = "HTTP/1.1 200 OK\r\nContent-Length: 11\r\nConTent-Type: text/plain\r\n\r\nHello world";
 
 typedef struct{
     int clientfd;
@@ -29,10 +29,12 @@ int handleRead(char *data, THREAD_PARAM_S *param)
         if (nbytes == 0) {
             break;
         } else if (nbytes < BASE_DATASIZE_FEET) {
-            printf("read end : %s\n", data);
             reqHead_S head = {0};
             if (zv_parseHead(data, dataSize, &head) == 0){
-                write(param->clientfd, rep, strlen(rep));
+                // write(param->clientfd, rep, strlen(rep));
+//                respText(param->clientfd, ZV_HTTP_OK, "hello world");
+//                respHTML(param->clientfd, ZV_HTTP_OK, "Google.html");
+                zvHandleRouters(param->clientfd, &head);
                 break;
             }
             else {
