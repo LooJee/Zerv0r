@@ -1,0 +1,6 @@
+[submodule "3rdparty/cThreadPool"]
+	path = 3rdparty/cThreadPool
+	url = https://github.com/LooJee/cThreadPool.git
+[submodule "3rdparty/cJSON"]
+	path = 3rdparty/cJSON
+	url = https://github.com/LooJee/cJSON.git

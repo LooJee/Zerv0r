@@ -70,7 +70,7 @@ void *handleClient(void *arg)
     if (data == NULL) {
         perror("malloc data size failed");
     } else {
-        printf("handle client %u\n", pthread_self());
+        printf("handle client %lu\n", pthread_self());
         handleRead(data, param);
     }
 
