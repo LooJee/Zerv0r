@@ -12,6 +12,7 @@
 #include "zv_reqStruct.h"
 #include "zv_resp.h"
 #include "zv_router_handlers.h"
+#include "../3rdparty/cThreadPool/src/threadpool.h"
 
 #define BASE_DATASIZE_FEET 256
 
@@ -60,7 +61,7 @@ int handleRead(char *data, THREAD_PARAM_S *param)
     return ret;
 }
 
-void *handleClient(void *arg)
+void handleClient(void *arg)
 {
     char *data = NULL;
     int ret = -1;
@@ -78,7 +79,7 @@ void *handleClient(void *arg)
     S_FREE(param);
     printf("handle client end\n");
 
-    pthread_exit((void *)&ret);
+//    pthread_exit((void *)&ret);
 }
 
 int powerOn(void)
@@ -87,6 +88,7 @@ int powerOn(void)
     int client = 0;
     int sockOpt = 1;
     int httpd = 0;
+    pThreadPool_T tpool = tpNew(4);
 
     socklen_t addrlen = sizeof(struct sockaddr_in);
     httpd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -131,19 +133,24 @@ int powerOn(void)
             continue;
         }
 
-        pthread_t thid;
-        if (pthread_create(&thid, NULL, handleClient, (void*)param)) {
-            perror("create thread failed");
-            continue;
-        }
-        printf("child thread id : %u\n", thid);
+        pTPTask_T task = taskNew(handleClient, (void*)param, NULL, NULL);
+        tpAddTask(tpool, task);
 
-        /*使用pthread_detach,主线程就不需要等待子线程结束，子线程结束时，资源将自动释放*/
-        if (pthread_detach(thid)) {
-            perror("detach thread failed");
-            continue;
-        }
+//        pthread_t thid;
+//        if (pthread_create(&thid, NULL, handleClient, (void*)param)) {
+//            perror("create thread failed");
+//            continue;
+//        }
+//        printf("child thread id : %u\n", thid);
+//
+//        /*使用pthread_detach,主线程就不需要等待子线程结束，子线程结束时，资源将自动释放*/
+//        if (pthread_detach(thid)) {
+//            perror("detach thread failed");
+//            continue;
+//        }
     }
+
+    tpFree(tpool);
 
     return 0;
 }
