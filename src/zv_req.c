@@ -28,7 +28,6 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
         return -1;
     }
 
-    printf("method : %s, url : %s, version : %s\n", head->reqline->method, head->reqline->url, head->reqline->version);
     req += ret;
 
     //报文首部和报文正文以另起一行的\r\n来分隔
@@ -39,21 +38,13 @@ int zv_parseHead(const char *req, int size, pReqHead_S head)
         while (*req != ':') {
             method[i++] = *(req++);
         }
-        printf("method : %s\n", method);
         if ((offset = zv_callHeadCBs(head, method, req)) < 0) {
-            SKIP_NEWLINE(req);
+            req = strchr(req, '\n');
+            ++req;
         } else {
             req += offset;
         }
     }
-
-//    if (strncmp(head->reqline->method, "GET", strlen("GET")) == 0) {
-//        return 0;
-//    } else if (strncmp(head->reqline->method, "POST", strlen("POST")) == 0) {
-//        return 0;
-//    } else {
-//        return -1;
-//    }
 
     return 0;
 }

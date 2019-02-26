@@ -12,6 +12,7 @@
 #include "zv_reqStruct.h"
 #include "zv_resp.h"
 #include "zv_router_handlers.h"
+#include "zv_hdr_func.h"
 #include "../3rdparty/cThreadPool/src/threadpool.h"
 
 #define BASE_DATASIZE_FEET 256
@@ -19,6 +20,17 @@
 typedef struct{
     int clientfd;
 } THREAD_PARAM_S;
+
+void zvHttpFree(pReqHead_S head)
+{
+    if (head->reqline != NULL) {
+        hdrReqlineFree(&head->reqline);
+    }
+
+    if (head->host != NULL) {
+        hdrHostFree(&head->host);
+    }
+}
 
 int handleRead(char *data, THREAD_PARAM_S *param)
 {
@@ -33,15 +45,12 @@ int handleRead(char *data, THREAD_PARAM_S *param)
             reqHead_S head = {0};
             if (zv_parseHead(data, dataSize, &head) == 0){
                 zvHandleRouters(param->clientfd, &head);
-                break;
             }
             else {
                 printf("goodbye\n");
-                break;
             }
-
-            offset = 0;
-            memset(data, 0, strlen(data));
+            zvHttpFree(&head);
+            break;
         } else {
             offset += nbytes;
             if (dataSize <= offset) {
@@ -71,14 +80,11 @@ void handleClient(void *arg)
     if (data == NULL) {
         perror("malloc data size failed");
     } else {
-        printf("handle client %lu\n", pthread_self());
         handleRead(data, param);
     }
 
     close(param->clientfd);
     S_FREE(param);
-    printf("handle client end\n");
-
 //    pthread_exit((void *)&ret);
 }
 
@@ -135,19 +141,6 @@ int powerOn(void)
 
         pTPTask_T task = taskNew(handleClient, (void*)param, NULL, NULL);
         tpAddTask(tpool, task);
-
-//        pthread_t thid;
-//        if (pthread_create(&thid, NULL, handleClient, (void*)param)) {
-//            perror("create thread failed");
-//            continue;
-//        }
-//        printf("child thread id : %u\n", thid);
-//
-//        /*使用pthread_detach,主线程就不需要等待子线程结束，子线程结束时，资源将自动释放*/
-//        if (pthread_detach(thid)) {
-//            perror("detach thread failed");
-//            continue;
-//        }
     }
 
     tpFree(tpool);

@@ -34,21 +34,19 @@ int hdrHostParse(pHdrHost_T host, const char *value)
     }
 
     SKIP_SPACE(value);
-    char *s = value, *e = value;
+    const char *s = value, *e = value;
     e = strchr(s, ':');
     if (e == NULL) {
         e = strchr(s, '\r');
         host->host = (char *)malloc(e-s);
         if (host->host == NULL) {
-            hdrHostFree(&host);
-            return -1;
+            goto ERROR_DEAL;
         }
         strncpy(host->host, s, e-s);
     } else {
         host->host = (char *)malloc(e-s);
         if (host->host == NULL) {
-            hdrHostFree(&host);
-            return -1;
+            goto ERROR_DEAL;
         }
         strncpy(host->host, s, e-s);
 
@@ -56,14 +54,12 @@ int hdrHostParse(pHdrHost_T host, const char *value)
         s = e;
         e = strchr(s, '\r');
         if (e == NULL) {
-            hdrHostFree(&host);
-            return -1;
+            goto ERROR_DEAL;
         }
         
         host->port = (char *)malloc(e-s);
         if (host->port == NULL) {
-            hdrHostFree(&host);
-            return -1;
+            goto ERROR_DEAL;
         }
 
         strncpy(host->port, s, e-s);
@@ -72,6 +68,10 @@ int hdrHostParse(pHdrHost_T host, const char *value)
     SKIP_NEWLINE(e);
 
     return e-value;
+
+    ERROR_DEAL:
+    hdrHostFree(&host);
+    return -1;
 }
 
 int hdrHostSet(pReqHead_S head, const char *value)

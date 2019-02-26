@@ -18,13 +18,12 @@
     }                   \
 }while(0);
 
-#define SKIP_CHARACTOR(p, c) do { \
-}while (p && *(++p) == c)
+#define SKIP_CHARACTOR(p, c) while((p != NULL) && *(p) != c) {  \
+    ++p;                                                \
+};
 
 #define SKIP_SPACE(p) SKIP_CHARACTOR(p, ' ')
-
 #define SKIP_NEWLINE(p) SKIP_CHARACTOR(p, '\n')
-
 #define SKIP_COLON(p) SKIP_CHARACTOR(p, ':')
 
 #endif
