@@ -20,7 +20,7 @@ typedef struct {
 
 typedef struct {
     pRespHead_T head;
-    char *content;
+    const char *content;
 }resp_T, *pResp_T;
 
 void respInit();

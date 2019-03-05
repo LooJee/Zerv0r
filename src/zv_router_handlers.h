@@ -7,13 +7,14 @@
 
 #include "zv_reqStruct.h"
 
-typedef void (*routerHandler)(int, pReqHead_S);
 
 typedef struct {
     char *router;
     routerHandler handler;
 }routers_T, pRouters_T;
 
-void zvHandleRouters(int sock, pReqHead_S head);
+void zvHandleRouters(int sock, pRequest_T req);
+routerHandler zvHttpExceptionHandler(ZV_HTTP_CODE_E code);
 
+routerHandler zvContainsUri(const char *uri_s, const char *uri_e);
 #endif //ZERV0R_ZV_ROUTER_HANDLERS_H

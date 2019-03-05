@@ -3,8 +3,9 @@
 
 #include "zv_reqStruct.h"
 
-int hdrReqlineSet(pReqHead_S head, const char *value);
-int hdrHostSet(pReqHead_S head, const char *value);
+ZV_PARSE_STATE_E hdrReqlineSet(pParseStruct_T p);
+ZV_PARSE_STATE_E hdrHostSet(pParseStruct_T p);
+ZV_PARSE_STATE_E hdrNonetSet(pParseStruct_T p);
 
 void hdrReqlineFree(pHdrReqLine_T *reqline);
 void hdrHostFree(pHdrHost_T *host);

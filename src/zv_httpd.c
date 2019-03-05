@@ -21,35 +21,58 @@ typedef struct{
     int clientfd;
 } THREAD_PARAM_S;
 
-void zvHttpFree(pReqHead_S head)
+pRequest_T zvRequestInit(pParseStruct_T p)
 {
-    if (head->reqline != NULL) {
-        hdrReqlineFree(&head->reqline);
+    p->req = (pRequest_T)malloc(sizeof(request_T));
+    if (p->req == NULL) {
+        printf("malloc request faield\n");
     }
 
-    if (head->host != NULL) {
-        hdrHostFree(&head->host);
-    }
+    return p->req;
 }
 
-int handleRead(char *data, THREAD_PARAM_S *param)
+void zvHttpFree(pParseStruct_T p)
+{
+    if (p->req->reqline != NULL) {
+        hdrReqlineFree(&p->req->reqline);
+    }
+
+    if (p->req->host != NULL) {
+        hdrHostFree(&p->req->host);
+    }
+
+    ZV_S_FREE(p->req);
+}
+
+int handleRead(THREAD_PARAM_S *param)
 {
     int nbytes = 0;
     int dataSize = BASE_DATASIZE_FEET;
     int offset = 0;
     int ret = 0;
+    char *data = (char *)malloc(BASE_DATASIZE_FEET * 4);
+    if (data == NULL) {
+        return -1;
+    }
+
     while ((nbytes = read(param->clientfd, data+offset, BASE_DATASIZE_FEET)) >= 0) {
         if (nbytes == 0) {
             break;
         } else if (nbytes < BASE_DATASIZE_FEET) {
-            reqHead_S head = {0};
-            if (zv_parseHead(data, dataSize, &head) == 0){
-                zvHandleRouters(param->clientfd, &head);
+            parseStruct_T p = {0};
+            if (zvRequestInit(&p) == NULL) {
+                return -1;
+            }
+            p.req_s = p.req_cursor = data;
+            p.req_e = data + (dataSize - BASE_DATASIZE_FEET + nbytes);
+            if (zv_parseRequest(&p) == 0){
+                p.handler(param->clientfd, p.req);
             }
             else {
                 printf("goodbye\n");
             }
-            zvHttpFree(&head);
+            zvHttpFree(&p);
+            ZV_S_FREE(data);
             break;
         } else {
             offset += nbytes;
@@ -65,27 +88,19 @@ int handleRead(char *data, THREAD_PARAM_S *param)
         ret = -1;
     }
 
-    S_FREE(data);
+    ZV_S_FREE(data);
 
     return ret;
 }
 
 void handleClient(void *arg)
 {
-    char *data = NULL;
-    int ret = -1;
     THREAD_PARAM_S *param = (THREAD_PARAM_S*)arg;
 
-    data = (char *)malloc(BASE_DATASIZE_FEET);
-    if (data == NULL) {
-        perror("malloc data size failed");
-    } else {
-        handleRead(data, param);
-    }
+    handleRead(param);
 
     close(param->clientfd);
-    S_FREE(param);
-//    pthread_exit((void *)&ret);
+    ZV_S_FREE(param);
 }
 
 int powerOn(void)

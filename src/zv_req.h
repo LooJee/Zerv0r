@@ -3,6 +3,6 @@
 
 #include "zv_reqStruct.h"
 
-int zv_parseHead(const char *req, int size, pReqHead_S head);
+int zv_parseRequest(pParseStruct_T p);
 
 #endif

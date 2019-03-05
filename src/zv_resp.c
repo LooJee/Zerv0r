@@ -73,7 +73,7 @@ char *readFromFile(const char *path, int *len)
     if (nbytes == -1) {
         perror("read from file failed\n");
         close(fd);
-        S_FREE(fcontent);
+        ZV_S_FREE(fcontent);
     }
 
     close(fd);
@@ -98,7 +98,7 @@ int respHTMLFile(int sock, ZV_HTTP_STATUS_E status, const char *path)
 
     respResponse(sock, &resp);
 
-    S_FREE(resp.content);
+    ZV_S_FREE(resp.content);
 
     return 0;
 }
