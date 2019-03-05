@@ -22,7 +22,6 @@ int respResponse(int sock, pResp_T resp)
 {
     char respHead[MAX_RESP_HEAD_SIZE] = {0};
     snprintf(respHead, MAX_RESP_HEAD_SIZE, rep, resp->head->statusCode, resp->head->statusStr, resp->head->contentLength, resp->head->contentType);
-//    printf("respHead : %s\n", respHead);
 
     write(sock, respHead, strlen(respHead));
     write(sock, resp->content, resp->head->contentLength);
